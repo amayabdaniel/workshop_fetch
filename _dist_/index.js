@@ -1,61 +1,42 @@
-/**
- * This file is just a silly example to show everything working in the browser.
- * When you're ready to start on your site, clear the file. Happy hacking!
- **/
-const baseUrl = 'https://platzi-avo.vercel.app';
+const baseUrl = "https://platzi-avo.vercel.app";
+const mountNode = document.getElementById("entradaJavaScript");
 
-//web api
-//connexión a la web api
-window
-    .fetch(`${baseUrl}/api/avo`)
-    .then((respuesta) => respuesta.json())
-    .then(responseJson => {
-        const todosLosItems = [];
-        responseJson.data.forEach(item => {
-            //imagen
-            const imagen = document.createElement("img");
-            imagen.src = `${baseUrl}${item.image}`;
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-EN", {
+    style: "currency",
+    currency: "USD",
+  }).format(price);
 
-            //title
-            const title = document.createElement("h2");
-            title.textContent = item.name;
+!(async function () {
+  const response = await fetch(`${baseUrl}/api/avo`);
+  const { data: allAvos } = await response.json();
 
-            //precio
-            const price = document.createElement("div");
-            price.textContent = item.price;
+  const arregloNodos = allAvos.map((avocado) => {
+    const imagen = document.createElement("img");
+    imagen.className =
+      "h-16 w-16 md:h-24 md:w-24 rounded-full mx-auto md:mx-0 md:mr-6";
+    imagen.src = `${baseUrl}${avocado.image}`;
 
+    const title = document.createElement("h2");
+    title.className = "text-lg";
+    title.textContent = avocado.name;
 
-            const container = document.createElement("div");
-            container.append(imagen, title, price);
+    const price = document.createElement("div");
+    price.className = "text-gray-600";
+    price.textContent = formatPrice(avocado.price);
 
-            todosLosItems.push(container);
-        });
-        document.body.append(...todosLosItems);
-    });
+    const precioYTitulo = document.createElement("div");
+    precioYTitulo.className = "text-center md:text-left";
+    precioYTitulo.appendChild(title);
+    precioYTitulo.appendChild(price);
 
-//web api
-/*
-async function fetchData() {
-    const response = await fetch(url),
-        data = await response.json(),
-        allItems = [];
+    const card = document.createElement("div");
+    card.className = "md:flex bg-white rounded-lg p-6 hover:bg-gray-300";
+    card.appendChild(imagen);
+    card.appendChild(precioYTitulo);
 
-    data.data.forEach((item) => {
-        // create image
-        const image = document.createElement("img");
-        // create title
-        const title = document.createElement("h2");
-        // create price
-        const price = document.createElement("div");
+    return card;
+  });
 
-        const container = document.createElement("div");
-        container.append(image, title, price);
-
-        allItems.push(container);
-    });
-
-    document.body.append(...allItems)
-}
-
-fetchData();
-*/
+  mountNode.append(...arregloNodos);
+})();
